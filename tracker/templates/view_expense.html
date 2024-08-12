@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Expense</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div>
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a href="{% url 'home' %}" class="nav-link">Home</a></li>
+                <li><a href="{% url 'logout_page' %}" class="nav-link">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h1 class="mb-4">View Expense</h1>
+        <div class="card">
+            <div class="card-body">
+                {% if transactions %}
+                    <ul class="list-group list-group-flush">
+                        {% for transaction in transactions %}
+                            <li class="list-group-item">
+                                <strong>Description:</strong> {{ transaction.description }} <br>
+                                <strong>Amount:</strong> {{ transaction.amount }}.Rs <br>
+                                <strong>Category:</strong> {{ transaction.category }} <br>
+                                <strong>Date:</strong> {{ transaction.date }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p>You have no expenses recorded yet.</p>
+                {% endif %}
+            </div>
+        </div>
+        <div class="mt-4">
+            <a href="{% url 'add_expense' %}" class="btn btn-primary">Add Expense</a>
+            <!-- <a href="{% url 'add_category' %}" class="btn btn-secondary">Add Category</a> -->
+            <a href="{% url 'generate_report' %}" class="btn btn-success">Generate Report</a>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
