@@ -64,19 +64,19 @@ def login_page(request):
         refresh_token = str(refresh)
         print(access_token)
 
-        return JsonResponse({
-            'access_token': access_token,
-            'refresh_token': refresh_token
-        }, status=200)
+        # return JsonResponse({
+        #     'access_token': access_token,
+        #     'refresh_token': refresh_token
+        # }, status=200)
 
-        # user_obj = authenticate(username=username, password=password)
+        user_obj = authenticate(username=username, password=password)
 
-        # if not user_obj:
-        #     messages.error(request, 'Error: Invalid credentials')
-        #     return redirect('login')
+        if not user_obj:
+            messages.error(request, 'Error: Invalid credentials')
+            return redirect('login')
         
-        # login(request, user_obj)
-        # return redirect('home')
+        login(request, user_obj)
+        return redirect('home')
 
     return render(request, 'login.html')
 
@@ -118,6 +118,27 @@ def add_category(request):
     else:
         form = TransactionForm()
     return render(request, 'add_category.html', {'form': form})
+
+@login_required
+def edit_expense(request, id):
+    transaction = Transaction.objects.get(id=id, created_by=request.user)
+    
+    if request.method == 'POST':
+        form = TransactionForm(request.POST, instance=transaction)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Expense updated successfully')
+            return redirect('view_expense')
+    else:
+        form = TransactionForm(instance=transaction)
+    return render(request, 'edit_expense.html', {'form': form, 'transaction': transaction})
+
+@login_required
+def delete_expense(request, id):
+    queryset = Transaction.objects.get(id=id)
+    queryset.delete()
+    return redirect('view_expense')
+
 
 @login_required
 def generate_report(request):
