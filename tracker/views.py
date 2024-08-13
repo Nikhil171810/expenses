@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
 from django.urls import reverse
 from .models import Transaction
 from .forms import TransactionForm, ReportForm
@@ -16,6 +16,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth.models import User
 from django.http import JsonResponse
 from django.contrib.auth import authenticate
+
+from django.http import HttpResponse
+from reportlab.pdfgen import canvas
+from reportlab.lib.pagesizes import letter
+
 
 # Registration view
 def registration(request):
@@ -170,3 +175,25 @@ def generate_report(request):
         form = ReportForm()
     
     return render(request, 'generate_report.html', {'form': form})
+
+def generate_pdf(request):
+    # Create the HttpResponse object with PDF headers
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="expense_report.pdf"'
+
+    p = canvas.Canvas(response, pagesize=letter)
+
+    p.setFont("Helvetica", 16)
+    p.drawString(100, 750, "Expense Report")
+
+
+    expenses = Transaction.objects.filter(created_by=request.user)
+    y = 700
+    for expense in expenses:
+        p.setFont("Helvetica", 12)
+        p.drawString(100, y, f"{expense.date} - {expense.description}: {expense.amount}")
+        y -= 20
+
+    p.showPage()
+    p.save()
+    return response
